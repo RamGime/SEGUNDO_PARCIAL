@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  # nombre del servio
+  database: 
+    # imagen a utilizar
+    image: mysql:8.0.33
+
+    # nombre del contenedor
+    container_name: ramiro-database
+
+    # variables de entorno
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ramiroXD
+
+    # mapeo de puertos
+    ports:
+      - 3306:3306
+
+    volumes:
+      - ./dbdata/mysql:/var/lib/mysql
+
+  mongodb:
+    image: mongo:6.0
+    container_name: my-mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb-data:/data/db
+
+      
+
+ 
+  servidor:
+    # nombre del contendor
+    container_name: express-server
+    
+
+    # imagen a utilizar
+    
+    build:
+      # carpeta donde se encuentra el codigo
+      context: ./server
+
+      # ubica el dockerfile
+      dockerfile: Dockerfile
+
+    # variables de entorno
+    environment:
+      PORT: 3000
+      DATABASE_HOST: database
+      DATABASE_USER: root
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: ramiroXD
+
+    # si falla intenta reiniciarse
+    restart: always
+
+    # dependencias del contenedor
+    depends_on:
+      - database
+      - mongodb
+    
+      
+
+    # mapeo de puertos
+    ports:
+      - 3000:3000
+
+    volumes:
+      - ./server:/server
